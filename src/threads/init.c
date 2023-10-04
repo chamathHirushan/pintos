@@ -133,12 +133,67 @@ pintos_init (void)
     /* Run actions specified on kernel command line. */
     run_actions (argv);
   } else {
-    // TODO: no command line passed to kernel. Run interactively 
-  }
+    // TODO: no command line passed to kernel. Run interactively
+    while(true){            //while loop for continuous running
+      printf("\nCS2043> ");
+      char in_str[50];         //variable for inserting string
+      int len=0;
+      while(true){          //while loop to get character by character
+        char newchr= input_getc();
+        if (newchr==13){
+          break;            //ENTER
+        }
+        if ((newchr==8)){
+          if (len >0){
+            printf("\b \b");
+            len--;          //BACKSPACE
+          }
+          continue;
+        }
 
-  /* Finish up. */
-  shutdown ();
-  thread_exit ();
+        printf("%c",newchr);
+        in_str[len]=newchr;    //adding character
+        len++;
+      }
+      in_str[len]='\0';
+      char whoami[] = "GUNAPALA S.A.C.H. -  210190R";
+
+      //matching commands
+
+      if (strcmp(in_str,"whoami") ==  0){               //who am i command
+        printf("\n%s\n",whoami);
+      }
+      else if(strcmp(in_str,"shutdown")==0){            //shutdown command
+        printf("\nshutting down..");
+        shutdown_power_off();
+      }
+      else if(strcmp(in_str,"thread")==0){              //thread status
+        printf("\n");
+        thread_print_stats();
+      }
+      else if(strcmp(in_str,"priority")==0){            //thread prority
+        printf("\nCurrent thread is running with %d priority\n",thread_get_priority());
+      }
+      else if(strcmp(in_str,"time") ==  0){                 //time since unix epoch
+        printf("\ntime since unix epoch - %ld seconds\n",rtc_get_time());
+      }
+      else if(strcmp(in_str,"ram")==0){                  //check RAM
+        printf("\nAvailable RAM for PintOS - %u KB\n",init_ram_pages*PGSIZE/1024);
+      }
+      else if(strcmp(in_str,"exit")==0){                //exit command
+        printf("\nExiting interactive shel...Bye!\n");
+        thread_exit();
+        break;
+      }
+      else{
+        printf("\nCommand not found\n");                //handle invalid command
+      }
+    }
+  } //end here
+
+  /*Finish up*/
+  shutdown();
+  thread_exit();
 }
 
 /* Clear the "BSS", a segment that should be initialized to
